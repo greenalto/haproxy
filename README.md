@@ -24,6 +24,7 @@ Attributes
 * `node['haproxy']['enable_ssl']` - whether or not to create listeners for ssl, default false
 * `node['haproxy']['ssl_member_port']` - the port that member systems will be listening on for ssl, default 8443
 * `node['haproxy']['ssl_incoming_port']` - sets the port on which haproxy listens for ssl, default 443
+* `node['haproxy']['proxies']` - used by the `proxies` recipe to set up multiple proxies. Default `[]`. See the "`proxies` recipe" section in this README for help.
 
 Usage
 =====
@@ -49,6 +50,27 @@ The search uses the node's `chef_environment`. For example, create `environments
     name "production"
     description "Nodes in the production environment."
     % knife environment from file production.rb
+
+### `proxies` recipe
+
+The `proxies` recipe is designed to be used from your own cookbook:
+
+Example: `my_recipe::haproxy`
+
+    node.override['haproxy']['app_server_role'] = 'webserver'
+    node.override['haproxy']['enable_ssl'] = true
+    node.override['haproxy']['x_forwarded_for'] = true
+    node.override['haproxy']['proxies'] = [
+      { :name => 'ssh',   :incoming_port => 22,  :outgoing_port => 22,
+        :options => ['mode tcp',
+                     'srvtimeout 3600000',
+                     'clitimeout 3600000'] },
+      { :name => 'http',  :incoming_port => 80,  :outgoing_port => 80 },
+      { :name => 'https', :incoming_port => 443, :outgoing_port => 443,
+        :options => ['mode tcp'] }
+    ]
+    include_recipe 'haproxy::proxies'
+
 
 License and Author
 ==================

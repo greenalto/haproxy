@@ -8,6 +8,7 @@ version           "1.0.6"
 
 recipe "haproxy", "Installs and configures haproxy"
 recipe "haproxy::app_lb", "Installs and configures haproxy by searching for nodes of a particular role"
+recipe "haproxy::proxies", "Installs and configures haproxy by searching for nodes of a particular role and set up multiple proxies"
 
 %w{ debian ubuntu }.each do |os|
   supports os
